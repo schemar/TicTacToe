@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
 
 
 contract TicTacToe {
@@ -14,8 +14,13 @@ contract TicTacToe {
 		Players[3][3] board;
 	}
 
-	mapping(uint256 => Game) games;
-	uint256 nrOfGames;
+	mapping(uint256 => Game) private games;
+	uint256 private nrOfGames;
+
+	event GameCreated(uint256 gameId, address creator);
+	event PlayerJoinedGame(uint256 gameId, address player, uint8 playerNumber);
+	event PlayerMadeMove(uint256 gameId, address player, uint xCoordinate, uint yCoordinate);
+	event GameOver(uint256 gameId, Winners winner);
 
     function newGame() public returns (uint256 gameId) {
     	Game memory game;
@@ -23,6 +28,8 @@ contract TicTacToe {
 
     	nrOfGames++;
     	games[nrOfGames] = game;
+
+    	emit GameCreated(nrOfGames, msg.sender);
 
     	return nrOfGames;
     }
@@ -37,12 +44,14 @@ contract TicTacToe {
 
     	if (game.playerOne == address(0)) {
     		game.playerOne = player;
+    		emit PlayerJoinedGame(_gameId, player, uint8(Players.PlayerOne));
 
     		return (true, "Joined as player one.");
     	}
 
     	if (game.playerTwo == address(0)) {
     		game.playerTwo = player;
+    		emit PlayerJoinedGame(_gameId, player, uint8(Players.PlayerTwo));
 
     		return (true, "Joined as player two. Player one can make the first move.");
     	}
@@ -71,11 +80,12 @@ contract TicTacToe {
     	}
 
     	game.board[_xCoordinate][_yCoordinate] = game.playerTurn;
-    	// TODO: memory or storage? Or automatically on stack as uint8?
-    	// Also below.
+    	emit PlayerMadeMove(_gameId, msg.sender, _xCoordinate, _yCoordinate);
+
     	Winners winner = calculateWinner(game.board);
     	if (winner != Winners.None) {
     		game.winner = winner;
+    		emit GameOver(_gameId, winner);
 
     		return (true, "The game is over.");
     	}
@@ -83,13 +93,6 @@ contract TicTacToe {
     	nextPlayer(game);
 
     	return (true, "");
-    }
-
-    function getGame(uint256 _gameId) public view returns (Game game) {
-    	// Solidity will always return a Game at the given index.
-    	// If no game exists, an initialized Game will be returned.
-    	// That is due to how maps work in solidity.
-    	return games[_gameId];
     }
 
     function getCurrentPlayer(Game storage _game) private view returns (address player) {
@@ -105,7 +108,6 @@ contract TicTacToe {
     }
 
     function calculateWinner(Players[3][3] memory _board) private pure returns (Winners winner) {
-    	// TODO: enum on stack or memory/storage?
     	Players player = winnerInRow(_board);
     	if (player == Players.PlayerOne) {
     		return Winners.PlayerOne;
