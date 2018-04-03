@@ -1,0 +1,16 @@
+{
+  "name": "tictactoe",
+  "version": "1.0.0",
+  "description": "A Solidity implementation of TicTacToe",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "truffle": "^4.1.3",
+    "solc": "^0.4.21"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Martin Schenck",
+  "license": "MIT"
+}
