@@ -16,6 +16,9 @@ It is important to use the pinned version `4.1.4` of truffle, as version `4.1.5`
 There are definitely still tests missing.
 Also JS tests, but especially tests written as contracts.
 
+### Code Duplication
+There is still duplicate code inside the contract and the tests. That code should be refactored/extracted.
+
 ### Separation of concerns
 Right now, the whole game is written in a single contract.
 It would be better to split the contract.
@@ -31,6 +34,9 @@ Contract management would be required to be able to swap the game logic without 
 In its current state, the contract can not be deleted or updated.
 Some managament should be included after the separation of concerns is done.
 It should allow to swap application logic or delete contracts (for authorized accounts only).
+
+### Libraries
+The code does not include any external libraries, be it via npm or EthPM. There are probably viable packages available, but as I am new to solidity, I don't have any experience with that, yet.
 
 ### Betting
 An extension to the current contract would be the option to play for ether.
